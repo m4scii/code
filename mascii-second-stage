@@ -1,0 +1,161 @@
+#!/usr/bin/awk -f
+
+/^%q/ { print; exit; } #quit execution
+/^%v\+\+/, /^%v--/ { print; next; } #absolute verbatim lines
+/^%v$/, /^%e$/ { print; next; } #preprocessed lines
+/^[ \t]*$/ { print; next; } # blank lines
+#/^%/ { print; next; } # comment lines
+
+{ 
+  # look at each token
+  for (i = 1; i <= NF; ++i) {
+
+    # skip comments, but keep them in place
+    if ($i ~ /^%/) { 
+      if (match($0, /%.*/)) {
+        $0 = substr($0, RSTART, length($0) - RSTART + 1);
+        print; next;
+      }
+    }
+
+    # brackets
+    if ( $i ~ /^\[/ ) { 
+      printf("$%s", $i); skip = "yes"; 
+      if ( match($i, "][?!.,;:]*$") ) { printf("$"); skip = "no"; }
+      printf(" "); continue; 
+    }
+    if ( $i ~ /\][?!.,;:]*$/ ) { 
+      printf("%s$ ", $i); skip = "no"; nl(); continue; 
+    }
+    if ( $i ~ /\][_^](.|{[^}].*})[?!.,;:]*$/ ) { 
+      printf("%s$ ", $i); skip = "no"; nl(); continue; 
+    }
+
+    # absolute values
+    if ( $i ~ /^\|/ ) { 
+      printf("$%s", $i); skip = "yes"; 
+      if ( match($i, "\\|[?!.,;:]*$") ) { printf("$"); skip = "no"; }
+      printf(" "); continue; 
+    }
+    if ( $i ~ /\|[?!.,;:]*$/ ) { 
+      printf("%s$ ", $i); skip = "no"; nl(); continue; 
+    }
+    if ( $i ~ /\|[_^](.|{[^}].*})[?!.,;:]*$/ ) { 
+      printf("%s$ ", $i); skip = "no"; nl(); continue; 
+    }
+
+    # parentheses
+    if ( $i ~ /^[-]?[a-zA-Z]*['\|]*.*\(/ ) { 
+      printf("$%s", $i); skip = "yes"; 
+      if ( match($i, ")[?!.,;:]*$") ) { printf("$"); skip = "no"; }
+      printf(" "); nl(); continue; 
+    }
+    if ( $i ~ /\)[?!.,;:]*$/ ) { 
+      printf("%s$ ", $i); skip = "no"; nl(); continue; 
+    }
+    if ( $i ~ /\)[_^](.|{[^}].*})[?!.,;:]*$/ ) { 
+      printf("%s$ ", $i); skip = "no"; nl(); continue; 
+    }
+
+    # skip tokens?
+    if (skip == "yes") { printf("%s ", $i); nl(); continue; }
+
+    # tags such as <oo>, <*>, et cetera
+    if ( $i ~ /^<..?>/ ) { printf("$%s$ ", $i); nl(); continue; }
+
+    # functions, variables, dummy sets, et cetera
+    fn = split("f g p q F b c d i j k m n r s t u v x y w z", f);
+
+    for (k = 1; k <= fn; ++k) {
+      if ( match($i, "^" f[k] "([][}{)(']*[?!,.:;]*)$") ) {
+        printf("$%s$ ",$i); nl(); jmp = "top"; break;
+      }
+
+# example: f^{(k)}
+#      if ( match($i, "^" f[k] "\\^(.|{[^}].*})[?!,.:;]*$") ) {
+#        printf("$%s$ ",$i); nl(); jmp = "top"; break;
+#      }
+
+      if ( match($i, "^" f[k] "[_^]+.[?!,.:;]*$") ) {
+        printf("$%s$ ",$i); nl(); jmp = "top"; break;
+      }
+    }
+
+    # no goto to the rescue?
+    if (jmp == "top") { jmp = ""; continue; }
+
+    sn = split("R Z Q N C", s);
+    for (k = 1; k <= sn; ++k) {
+      if ( match($i, "^" s[k] "[']*[,.:;]*$") ) {
+        printf("$\\mathbb{%s}$ ",$i); nl(); jmp = "top"; break;
+      }
+      if ( match($i, "^" s[k] "[_^](.|{[^}].*})[,.:;]*$") ) {
+        printf("$\\mathbb{%s}$ ",$i); nl(); jmp = "top"; break;
+      }
+
+    }
+
+    # no goto to the rescue?
+    if (jmp == "top") { jmp = ""; continue; }
+
+    # second pass fractions formatting
+    if ( $i ~ "\\dfrac{.*" ) {
+      printf("$%s$ ", $i); nl(); continue;
+    }
+
+    # second pass roots formatting
+    if ( $i ~ "\\sqrt[[{].*" ) {
+      printf("$%s$ ", $i); nl(); continue;
+    }
+
+    # capital letters
+    if ($i ~ /^[B-HJ-Z]+[!?.,;:]*$/) {
+      printf("$%s$ ", $i); nl(); continue;
+    }
+    if ($i ~ /^[B-HJ-Z]+[_^](.|{[^}].*})[!?.,;:]*$/) {
+      printf("$%s$ ", $i); nl(); continue;
+    }
+
+    # polynomials of degree n =/= 1
+    if ($i ~ "[-]*[0-9]*[mnpqrstuv]*[xyz]\\^(.|{[^}].*})[!?.,;:]*$") {
+      printf("$%s$ ", $i); nl(); continue;
+    }
+
+    # polynomials of degree n = 1
+    if ($i ~ "^[-]*[0-9]*[mnpqrstuv]*[xyz]$") {
+      printf("$%s$ ", $i); nl(); continue;
+    }
+
+    # operators
+    if ($i !~ /---/) {
+      if ($i ~ /^(\+|\^|-|+-|-+|<|>|<=|>=|=|=~|==|=\/=|->)$/) {
+        printf("$%s$ ", $i); nl(); continue;
+      }
+    }
+
+    # numbers
+    if ($i ~ /^[+-]?([0-9]+[.]?[0-9]*|[.][0-9]+)([.,:;?%]*)$/) {
+      printf("$%s$ ", $i); nl(); continue;
+    }
+
+    # examples: number^{exp} or number^e or number_{sub} or number_s
+    if ($i ~ /^[+-]?([0-9]+[.]?[0-9]*|[.][0-9]+)([_^](.|{[^}].*}))[?!.,;:]*$/) {
+      printf("$%s$ ", $i); nl(); continue;
+    }
+
+    # numeric unparenthesized fractions
+    if ($i ~ /^([+-]?([0-9]+[.]?[0-9]*|[.][0-9]+))\/([+-]?([0-9]+[.]?[0-9]*|[.][0-9]+))[?!.,;:]*$/) {
+      printf("$%s$ ", $i); nl(); continue;
+    }
+
+    # algebraic unparenthesized fractions
+    if ($i ~ /^.\/.[?!.,;:]*$/) {
+      printf("$%s$ ", $i); nl(); continue;
+    }
+
+    # a regular token
+    printf("%s ",$i); nl();
+  }
+}
+
+function nl() { if (i == NF) printf("\n"); }

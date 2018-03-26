@@ -1,0 +1,177 @@
+#!/usr/bin/awk -f 
+
+BEGIN {
+
+  while (getline ln > 0) {
+
+    # respect absolute verbatim request
+    if (ln ~ /^[ \t]*$/) { print; continue; }
+    if (ln ~ /^%q$/) { print; exit; } 
+    if (ln ~ /^%v--/) { skip = "no"; } 
+    if (ln ~ /^%v\+\+/) { skip = "yes"; }
+    if (skip == "yes") { print ln; continue; }
+
+    # simple replacements
+    sub(/^Solution\./, "{\\em Solution.}", ln);
+
+    # open mode: definition | proposition | theorem | ... 
+    if ( sub(/^Definition (\([^\)].*\))\./, "\\masciidef{}", ln) ) {
+      # grab ``(comment)'' and format it as def{comment}
+      end = "\\defend";
+    }
+   
+    if ( sub(/^Proposition\./, "\\masciiprop{}", ln) ) end = "\\propend";
+    if ( sub(/^Corollary\./, "\\masciicor{}", ln) ) end = "\\corend";
+    if ( sub(/^Theorem\./, "\\masciith{}", ln) ) end = "\\theend";
+    if ( sub(/^Remark\./, "\\masciirem{}", ln) ) end = "\\remend";
+    if ( sub(/^Exercise\./, "\\masciiexe{}", ln) ) end = "\\exeend";
+    if ( sub(/^Proof\./, "\\masciiproof{}", ln) ) end = "\\profend";
+    if ( sub(/^Lemma\./, "\\masciilemma{}", ln) ) end = "\\lemend";
+
+    # close mode by using the proper closing tag
+    sub(/%end$/, end, ln);
+
+    if ( sub(/^\(\*\) /, "", ln) ) { 
+      printf("\\section{%s}\n",ln); continue; 
+    }
+
+    if ( sub(/^\(\-\) /, "", ln) ) { 
+      printf("\\subsection{%s}\n",ln); continue; 
+    }
+
+    # center math mode; that is, $$ expresion $$
+    if ( sub(" %cm[ \t]*$", "", ln) ) { 
+      print ln; getline nxt; getline nxt;
+      sub (/ +/, "", nxt); nxt = mathmode(nxt); 
+      printf("%%v\n        $$%s$$\n%%e\n",nxt); 
+      getline nxt; continue;
+    }
+
+    # format fractions, roots, and integrals
+    ln = fractions(ln); ln = roots(ln); ln = cbrt(ln); # ln = integrals(ln);
+
+    # format especial functions
+    fn = split("lim sin cos lg log", f);
+    for (k = 1; k <= fn; ++k) { ln = fnc(ln, f[k]); }
+
+    # perform alignments
+    if ( match(ln, /%align by (<|>|<=|=>|=|=~|==)/) ) { 
+
+      # extract operator, begin construction
+      print ln; op = substr(ln, RSTART+10, RLENGTH);
+      getline nxt; print "%v"; print "\\begin{align*}"; #begin align
+
+      # read while in alignment mode
+      while ( getline nxt > 0) {
+      
+        # close alignment mode when done
+        if ( match(nxt, /^[ ]*$/) ) { printf("\\end{align*}\n%%e\n"); break; }
+
+        # remove spaces, format operator, run math mode scanner
+        sub(/ +/, "", nxt); sub(op, "\\&" op, nxt); nxt = mathmode(nxt);
+
+        # look for the last line which must end with punctuation
+        if ( ! match(nxt, /[ .,:;\\]$/) ) { printf("        %s\\\\\n", nxt); }
+        else { printf("        %s\n",nxt) };
+      }
+
+      continue;
+    }
+    print ln;
+  }
+}
+
+function invert(s    , c, t)
+{
+  t = length(s); while (t) c = c substr(s, t--, 1); return c;
+}
+
+function mathmode(s) 
+{
+  s = fractions(s); s = integrals(s); s = roots(s); s = cbrt(s);
+  return s;
+}
+
+function fractions(s    , frac, fmt)
+{
+  # format fractions grouped with {}: {a + b} / {c + d}
+  fmt = "({[^}].*}[ ]*/[ ]*{[^}].*})";
+  while ( match(s, fmt) ) {
+    frac = substr(s, RSTART, RLENGTH); # extract fraction
+    sub("/", "", frac); frac = "\\dfrac" frac ; # gsub(" ", "", frac);
+    sub(fmt, frac, s);
+  }
+
+  return s;
+}
+
+function integrals(s    , intg, fmt, i, lims, lim, fnc)
+{
+  # format integrals
+  fmt = "integral([^,].*,[ ]*from .+ to .+)";
+  while ( match(s, fmt) ) {
+    intg = substr(s, RSTART, RLENGTH); # extract integral
+    i = index(intg, ","); lims = substr(intg, i+1, RLENGTH - i); # find limits
+    split(lims, lim); sub(").*","",lim[4]); # lim[2] is lower, lim[4] is upper
+    fnc = substr(intg, 10, i - 10); # extract function
+    intg = sprintf("\\int_{%s}^{%s} %s", lim[2], lim[4], fnc);
+    sub(fmt, intg, s);
+  }
+  return s;
+}
+
+function roots(s    , root, fmt, i, j, rad, n)
+{
+  # format roots
+  fmt = "root\\{[^,].*,[^)].*\\}";
+
+  while ( match(s, fmt) ) {
+    root = substr(s, RSTART, RLENGTH); # extract root
+
+    i = index(root, ","); rad = substr(root, i+1, RLENGTH - i); 
+    sub("}[,.:;]*.*$","", rad); # find radicand
+
+    i = index(root, "root{"); n = substr(root, i+5, length(root) - i + 5); 
+    sub(",.*$","", n); # extract type of root
+
+    if (n + 0 == 2) root = sprintf("\\sqrt{%s}", rad);
+    else root = sprintf("\\sqrt[%s]{%s}", n, rad);
+    sub(fmt, root, s);
+  }
+  return s;
+}
+
+function cbrt(s    , root, fmt, i, j, rad)
+{
+  # format roots
+  fmt = "cbrt{[^}].*}";
+
+  while ( match(s, fmt) ) {
+    root = substr(s, RSTART, RLENGTH); # extract root
+
+    i = index(root, "{"); rad = substr(root, i+1, RLENGTH - i); 
+    sub("}[,.:;]*.*$","", rad); # find radicand
+    root = sprintf("\\sqrt[3]{%s}", rad);
+    sub(fmt, root, s);
+  }
+  return s;
+}
+
+function fnc(s, f    , root, fmt, i, j, rad)
+{
+  return s;
+#  format especial functions
+#  fmt = f "{[^}].*}";
+#  gsub(f, "\\" f, s);
+#  return s;
+#
+#  while ( match(s, fmt) ) {
+#    root = substr(s, RSTART, RLENGTH); # extract function
+#    i = index(root, "{"); rad = substr(root, i+1, RLENGTH - i); 
+#    sub("}[,.:;]*.*$","", rad); # find argument
+#    root = sprintf("\\" f "{%s}", rad);
+#    sub(fmt, root, s);
+#  }
+#
+#  return s;
+}

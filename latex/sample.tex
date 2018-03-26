@@ -1,0 +1,463 @@
+% 1  one inch + \hoffset      2  one inch + \voffset
+% 3  \oddsidemargin = 22pt    4  \topmargin = 22pt
+%   or \evensidemargin
+% 5  \headheight = 13pt       6  \headsep = 19pt
+% 7  \textheight = 595pt      8  \textwidth = 360pt
+% 9  \marginparsep = 7pt     10  \marginparwidth = 106pt
+% 11 \footskip = 27pt            \marginparpush = 5pt (not shown)
+%    \hoffset = 0pt              \voffset = 0pt
+%    \paperwidth = 597pt         \paperheight = 845pt
+
+%\setlength{\oddsidemargin}{0.5cm}
+%\setlength{\evensidemargin}{0.5cm}
+%\setlength{\marginparsep}{0.75cm}
+%\setlength{\marginparwidth}{2.5cm}
+%\setlength{\marginparpush}{1.0cm}
+%\setlength{\textwidth}{150mm}
+
+%% \documentclass[a4paper,10pt]{article}
+\documentclass{article}
+\usepackage[backend=biber]{biblatex}
+\addbibresource{refs.bib}
+
+\usepackage{listings}
+\usepackage{amsmath,amsthm,amssymb}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Teorema}[section]
+\newtheorem{definition}{Definição}[section]
+\newtheorem{lemma}[theorem]{Lema}
+\newtheorem{proposition}[theorem]{Proposição}
+\newtheorem{corollary}[theorem]{Corolário}
+\newtheorem{example}{Exemplo}[section]
+\newtheorem{remark}{Comentário}[section]
+
+\newtheoremstyle{pf}        % name
+                {10pt}      % space above
+                {3pt}       % space below
+                {}          % body font
+                {}          % indent amount (empty = 0, \parindent = para)
+                {\itshape}  % head font
+                {.}         % punctuation after head
+                {.5em}      % space after head
+                            % \newline = linebreak
+                {}          % head spec (empty means `normal')
+
+\theoremstyle{pf}
+\newtheorem*{pf}{Prova}
+
+% references
+\newcommand{\reflema}[1]{Lema \ref{#1}}
+\newcommand{\refth}[1]{Teorema \ref{#1}}
+\newcommand{\refex}[1]{Exemplo \ref{#1}}
+\newcommand{\refco}[1]{Corolario \ref{#1}}
+\newcommand{\refdef}[1]{Definição \ref{#1}}
+
+% sets
+\newcommand{\reals}{\mathbb{R}}
+\newcommand{\ints}{\mathbb{Z}}
+\newcommand{\rats}{\mathbb{Q}}
+\newcommand{\nats}{\mathbb{N}}
+
+% tags
+\newcommand{\de}[1]{\jmp\begin{definition}[#1]}
+\newcommand{\ed}{\end{definition}}
+\newcommand{\thm}[1]{\jmp\begin{theorem}[#1]}
+\newcommand{\mht}{\end{theorem}}
+\newcommand{\rem}[1]{\jmp\begin{remark}[#1]}
+\newcommand{\mer}{\end{remark}}
+\newcommand{\prf}{\begin{pf}}
+\newcommand{\frp}{\qed\end{pf}}
+\newcommand{\ex}[1]{\jmp\begin{example}[#1]}
+\newcommand{\xe}{\end{example}}
+
+% jumps
+\newcommand{\jmp}{\vspace{3pt}}
+
+% shortcuts
+\newcommand{\pit}{{\em Prova. }}
+\newcommand{\normal}{\unlhd}
+\newcommand{\cyclic}[1]{\langle #1 \rangle}
+\newcommand{\imp}{$\implies$}
+
+% mathematical functions
+\DeclareMathOperator{\mdc}{mdc}
+%% \DeclareMathOperator{\floor}{floor}
+\newcommand{\floor}[1]{\lfloor #1 \rfloor}
+
+\author{Fulano de Tal\\
+        \tt{fulano@example.bit}}
+\title{Relatório 1}
+\date{11 de setembro de 2017}
+
+\begin{document} \maketitle
+
+%% \abstract{Relatório 1 de observações feitas durante estudo orientado
+%%   em tópicos da teoria dos números com ênfase em criptografia,
+%%   semestre 2017.2.  Neste breve relatório ênfase foi dada ao Teorema de
+%%   Lagrange e breve seleção de corolários relativos à busca por
+%%   subgrupos.}
+
+\lstset{
+  basicstyle=\small
+}
+
+\setlength{\parskip}{7pt}
+\setlength{\parindent}{0pt}
+
+%% Pra bookmarcar algum ponto, use \label{tag}.  Pra fazer referência
+%% a um label, use \ref{tag}.  Pra citar publicações em refs.bib, use
+%% \cite[veja página 18]{ss}, onde ss é uma tag em refs.bib.  No meu
+%% caso aqui, ss é de [s]alahoddin [s]hokranian.  Por exemplo, eis uma
+%% citação\cite[página 1]{maxfield}.  Agora uma do Menezes\cite[página
+%% 287]{hac}.  Pronto pra começar.
+
+\section{Sobre o teorema de Lagrange}
+
+O Teorema de Lagrange nos garante que se existir um subgrupo $H$ de
+$G$, seu tamanho é de um divisor do tamanho de $G$, embora não nos
+garanta que haverá tal grupo.
+
+\begin{lemma} \label{lemalagrange} Seja $G$ um grupo, $H$ um subgrupo 
+de $G$. Cada classe lateral à direita tem a mesma cardinalidade que
+$H$. Em particular, quaisquer duas classes laterais à direita têm a
+mesma cardinalidade uma da outra.
+\end{lemma} 
+
+\prf Seja $Hg$ uma classe lateral à direita. Defina $p:H \to Hg$ por
+$p(h) = hg$. Preciso mostrar que $p$ é injetora, o que ela é porque
+$p(h_1) = p(h_2)$ implica $h_1 g = h_2g$ e daí obtemos $h_1 g g^-1=
+h_2 g g^{-1}$ e portanto $h_1 = h_2$.  Precisamos mostrar que $p$ é
+sobrejetora.  Pegue um $y$ em $Hg$ e por isso $y = hg$ para algum $h
+\in H$.  Agora note que $p(h) = hg = y$. Isso mostra que $p$ é
+sobrejetora e portanto bijetora.  Isso implica que a cardinalidade de
+$H$ é a mesma de $Hg$, isto é $|H| = |Hg|$.\frp
+
+Isso nos permite provar o Teorema de Lagrange com facilidade.  Note
+que embora o lema acima não se restrinja a grupos finitos, o Teorema
+de Lagrange o faz.
+
+\thm{Lagrange} \label{lagrange} Se $H$ é subgrupo de $G$, um grupo
+finito, então a ordem de $H$ divide a ordem de $G$.\mht
+
+\prf Considere $G/H.$ A operação binária de $G/H$ é uma classe de
+equivalência e portanto constrói conjuntos disjuntos $S_1, ..., S_k$
+tal que a união de todos nos dá o grupo $G$. Como a união de todos os
+elementos dos membros de $G/H$ é exatamente G, então tem ser o caso
+que $|G| = |S_1| + ... + |S_k|$.  Pelo \reflema{lemalagrange}, $|S_i|
+= |H|.$ Então %align by =
+%v
+\begin{align*}
+        |G| &= |S_1| + ... + |S_k|\\
+            &= k |H|,
+\end{align*}
+%e
+como desejado.\frp
+
+Como aplicação do \refth{lagrange}, vejamos dois teoremas que me
+parecem úteis no âmbito do problema do logaritmo discreto.
+
+\thm{} Se $g^t = e$, então $t$ divide $|G|$. \mht
+
+\prf Pelo \refth{lagrange}, a ordem do subgrupo cíclico gerado por $g$
+divide a ordem de $G.$ Mas a ordem do subgrupo gerado por $g$ é igual
+à ordem de $g.$ Logo, a ordem de $g$ divide a ordem de $G$\cite[página
+  32, primeiro parágrafo]{scc}.\frp
+
+\thm{} Todo grupo de ordem prima é cíclico e qualquer elemento 
+não-neutro de $G$ é um gerador. \mht 
+
+\prf Escolha $g \neq e \in G.$ Considere $\cyclic{g}.$ Pelo
+\refth{lagrange}, a ordem de $\cyclic{g}$ precisa dividir $|G|,$ que é
+$p,$ um número primo. Logo, $\cyclic{g}$ tem ordem $1$ ou $p.$ Mas
+$\cyclic{g}$ contém pelo menos dois elementos, $e$ e $g.$ Logo
+$\cyclic{g}$ não pode ter ordem $1$ e logo deve ter ordem $p$ e
+$\cyclic{g} = G.$ \frp
+
+%% \section{Sobre ideais}
+
+%% Comecemos com exemplos.  
+
+%% \begin{verbatim}
+%% Conheço alguns exemplos de anéis --- Z, Q, R, Z(n), {0} ---, mas não
+%% conheço exemplos de ideais.  Além de {0}, que é muito trivial, qual o
+%% primeiro ideal a se pensar?
+
+%% (*) Exemplo
+
+%% O inteiros pares, 2Z, formam um ideal em Z.  (Veja também nZ.)
+
+%% (*) Exemplo
+
+%% Os polinômios, de coeficientes reais, divisíveis por x^2 + 1 formam um
+%% ideal em R[x].
+
+%% (*) Exemplo
+
+%% O conjunto de matrizes n-por-n cuja última linha é zero forma um ideal
+%% de matrizes n-por-n.
+
+%% --8<---------------cut here---------------start------------->8---
+%% Forma um ideal pela direita.  Numa multiplicação entre i em I e a em A,
+%% o ideal pela direita coloca seu elemento na *esquerda*.  Ou seja, a
+%% matriz cuja última linha é zero posiciona-se do lado esquerdo da
+%% multiplicação.
+
+%%   i*a em I
+
+%% Assim, 
+
+%%   [1 1] [a b] = [a + c  b + d]
+%%   [0 0] [c d]   [  0      0  ]
+
+%% Ou seja, em um right-ideal, o elemento do ideal fica na esquerda.
+%% --8<---------------cut here---------------end--------------->8---
+
+%% (*) Exemplo
+
+%% O anél C(R) de funções contínuas contém o ideal de funções f tal que
+%% f(1) = 0.
+
+%% --8<---------------cut here---------------start------------->8---
+%% Esse exemplo é interessante para conjecturarmos alguma intuição sobre
+%%  ideais.
+
+%% Seja g(x) contínua e f(x) em I.  Considere f(1)g(1).
+
+%%    g(1) f(1) = g(1)*0 = 0 em I.
+%% --8<---------------cut here---------------end--------------->8---
+%% \end{verbatim}
+
+%% \section{Sobre o anel $Z_n[x]$}
+
+%% \begin{verbatim}
+%% --8<---------------cut here---------------start------------->8---
+%% Em primeiro lugar, Z(n) é o conjunto {0, 1, ..., n-1}, isto é, z mod n.
+%% Então Z(n)[x] é o anel de polinômios cujos coeficientes são elementos de
+%% Z(n).
+
+%% O propósito aqui é mostrar que o subgrupo aditivo <x> é bem diferente do
+%% ideal (x), o ideal gerado a partir do polinômio x.
+
+%%   <x,+> = {x, 2x, 0}
+
+%% porque 2x + x = 3x e 3 = 0.  Já
+
+%%   (x) = {0, x, 2x, 2x^2, x^3, ...} = {f(x) : f(0) = 0} 
+%% --8<---------------cut here---------------end--------------->8---
+%% \end{verbatim}
+
+\section{Sobre o número de dígitos em um inteiro}
+
+O exemplo 2.51\cite[capítulo 2, página 58]{hac} nos informa que o
+número de bits em um inteiro é $1 + \floor{\lg n}$.  Shokranian nos
+ensina a calcular o número de algarismos\footnote{``Algarismo'' vem de
+  al-Khowarazmi, que significa ``o homem de Khwarazm.''  É uma
+  referência a Ja'far Mohammed Ben Musa, que era conhecido como o
+  homem de Khwarazm.  O termo ``algoritmo'' também decorre dele.  Por
+  volta do ano 825, al-Khowarazmi escreve um livro sobre aritmética
+  explicando como usar os numerais do sistema Hindu-Arábico.  Mais
+  tarde o livro foi traduzido e apareceu em latim sob o título ``Liber
+  Algorismi'', que significa ``o livro de al-Khowarazmi.''\cite[página
+    21]{eti}} em um inteiro na base 10\cite[página 13]{ss}, mas a
+prova do teorema é diretamente generalizável a qualquer base, então
+trocamos a base 10 por uma base $M$.
+
+\thm{} \label{nbits} Em base $M,$ o número de dígitos de um inteiro $P$ é 
+%
+   $$1 + \floor{\log_M P}$$
+%
+\mht
+\prf Escreva $P$ em potências de base $M$.  (Por exemplo, em base
+10, $123 = 3*10^0 + 2*10^1 + 1*10^2$.)
+%
+   $$P = d_{n-1}M^{n-1} + d_{n-2}M^{n-2} + ... + d_{1}M^1 + d_{0}M^0$$
+%
+onde $d_i$ é o $i$-ésimo dígito de $P$.  Agora expresse $P$ colocando
+$M^{n-1}$ em evidência.
+%
+   $$P = M^{n-1} (d_{n-1} + d_{n-2}/M + ... + d_{1}/M^{n-2} + d_{0}/M^{n-1})$$
+%
+Seja $B = d_{n-1} + d_{n-2}/M + ... + d_{1}/M^{n-2} + d_{0}/M^{n-1}$ de
+tal forma que 
+%
+   $$P = M^{n-1} B$$
+%
+Note que cada cada $d_i < M$ porque cada $d_i$ é um dígito em base
+$M$.  Então $B < M$ porque note que $d_{n-1}$ é um inteiro menor que
+$M$ e então $d_{n-1}$ tem que estar distante de $M$ em pelo menos uma
+unidade.  O resto da soma nunca chega a totalizar uma unidade porque
+cada termo é dividido por uma potência de $M$.  Também note que 
+$B < M$ implica $\log B < 1$.
+
+Computando o log da equação acima, obtemos
+%
+\begin{align}
+   \log P &= (n - 1) \log M + \log B\\
+          &= (n - 1) + \log B
+\end{align}
+%
+Então $n - 1 = \log P - \log B$.  Uma vez que $n - 1$ é um intiro e
+$\log B < 1$, essa subtração não retira mais do que uma unidade.  Então
+%
+\begin{align}
+    n - 1 &= \floor{\log P}\\
+        n &= 1 + \floor{\log P}
+\end{align}
+%
+O que $n$ representa é o número de algarismos usados para representar
+$P$ em base $M$, como desejado.
+\frp
+
+\rem{} A equação 
+%
+  $$n - 1 = \log P - \log B$$
+%
+é curiosa porque temos um inteiro equacionado a uma diferença de
+logaritmos.  Temos que notar $B$ é cuidadosamente construída a partir
+de $P$.  $B$ é $P$ dividido por $M^{n - 1}$.  Então em base 10 por
+exemplo, seja $P = 87849$ com 5 dígitos e então $B = 8.7849$ porque
+$M^{n - 1} = 10^4$.  Agora, $\log P = 4.9437...$ enquanto que $\log B
+= 0.9437...$ A mesma expansão decimal na parte fracionada.  Subtraindo
+$\log B$ de $\log P$, obtemos o inteiro 4.\mer
+
+\ex{} Eis uma aplicação desse conhecimento.  Digamos que nossos
+computadores sejam capazes de computar com números tão grandes quanto
+$2^{64}$.  Quão grande é isso?  Poderíamos expressar $2^{64}$ em
+algarismos da base 10 para saber quantos algarismos são necessários.
+Mas se só queremos saber quantos algarismos são necessários, podemos
+aplicar o teorema acima: $1 + \floor{\log_{10} 2^{64}} = 1 + 19 = 20$
+algarismos.  Similarmente se quisermos saber o número de bits
+necessários para representar um certo inteiro, calculamos
+$\floor{\lg n} + 1$, como informado por Menezes.  \xe
+
+%% \section{Erro de digitação\cite[página 17, 18]{scc}}
+
+%% Quando ele diz onde $k=1,2,...,\floor{n/k}$, ele quer dizer onde
+%% $t=1,2,...,\floor{n/k}$ --- mera troca de letra.
+
+%% Em ``[c]omo $\lg(n) \leq \sqrt{n}$ se $n \geq 4$, então o custo do
+%% crivo de Eratóstenes é inferior a $O(n^2)$'', precisamos restringir
+%% que $n \geq 2^4$ e não apenas $n \geq 4$.
+
+\section{Sobre desertos de primos}
+
+Eis um argumento elementar para se obter um deserto de primos de
+tamanho arbitrário. Digamos que você queira um deserto de $4$ números.
+Comece com $(4+1)!$ e compute:%align by =
+%v
+\begin{align*}
+        (4+1)! &= 5! \\
+        &= 2*3*4*5 \\
+        &= 120.
+\end{align*}
+%e
+Você sabe que $120 + 2 = 122$ não é primo porque $2$ é fator de $120$
+e portanto $122$ também é divisível por $2.$ Similarmente, você sabe
+que $123$ não é primo porque $120$ é divisível por $3$ e portanto
+$123$ também.  Similarmente, $124$ é composto porque $4$ o
+divide. Similarmente, $5$ divide $125.$ Logo, entre $122$ e $125$ não
+há primo algum. Aí está seu deserto de primos em $4$ números.
+
+Isso nos dá uma técnica de encontrar um deserto tão grande quanto 
+queiramos. Se você quer um deserto de $560$ números, então comece com 
+%v
+        $$M = 561! = 2*3*4*5*6*...*561$$
+%e
+Certamente $M+2$ é composto pois $2$ o divide. Similarmente, $M+3$ é
+composto pois $3$ o divide. Similarmente, $M+561$ é composto pois
+$561$ o divide. Logo, de $561!+ 2$ até $561! + 561$ não há qualquer
+primo.
+
+%% \subsection{O lema ``2n escolhe n''}
+
+%% Seja n um inteiro positivo.  Então 
+%% %
+%%   $$C(2n, n) = \Pi_{p \in P(2n)} p^{k_p}$$
+%% %
+
+%% Estudemos esse lema.
+
+%% Estudemos também $2^n <= (2n^2)^\#$.
+
+%% O quociente de dois primoriais nos dá o produto de primos
+%% consecutivos.
+
+\section{Sobre complexidade}
+
+Em análise de algoritmos, usualmente não nos preocupamos com o custo
+de operações primitivas (relativa a um computador) como a
+multiplicação, divisão, soma e subtração de inteiros, mas no estudo de
+algoritmos da teoria dos números, nos preocupamos com a computação de
+números grandes, onde o custo dessas operações aritméticas se torna
+relevante.  Por exemplo, no problema de ordenação estamos preocupados
+com quantos números precisamos ordenar, não nos preocupando com o
+tamanho deles.  Já no problema da fatoração, é obrigatório considerar
+o tamanho do número a ser fatorado.  Por isso precisamos ajustar nosso
+raciocínio sobre o custo dessas operações.
+
+Se medirmos o tamanho dos números da entrada pela quantidade de bits,
+quando teremos muitas chances de aplicar o \refth{nbits}, então
+diremos que um algoritmo é eficiente se ele satisfizer a seguinte
+definição.
+
+\de{} \label{polytime} Um procedimento cuja entrada são os inteiros
+$a_1, a_2, ..., a_k$ tem custo polinomial se ele termina em tempo
+polinomial relativo a $$\lg(a_1), \lg(a_2), ...., \lg(a_k),$$
+respectivamente, isto é, relativo ao tamanho da entrada.\ed
+
+Em contextos onde o tamanho dos números é irrelevante, uma função que
+multiplica dois inteiros $a$, $b$ tem custo $\Theta(1)$, pois consome
+apenas uma multiplicação. No nosso contexto, o custo da multiplicação
+--- que é de ordem quadrática --- é contabilizado, então o custo é
+$\Theta(\max(\lg a,\lg b)^2)$.  
+
+\ex{} Por exemplo, considere o problema de multiplicar inteiros da
+ordem de $2^{161}$. Num determinado computador, o custo no pior caso
+será de $(161+1)^2 = 162^2 = 26244$ operações porque a multiplicação
+tem custo quadrático. Se aumentamos o tamanho da entrada em apenas um
+bit, o custo sobe para $163^2 = 26569$ operações. Não é apenas uma
+operação a mais. São 325 operações a mais.\xe
+
+\ex{} Considere um problema cuja solução tem custo exponencial em base
+2. Se a entrada tem tamanho 61 bits, o custo no pior caso é de
+2305843009213693952 operações. Se aumentamos a entrada para 62 bits, o
+custo passa a ser 4611686018427387904. São 2305843009213693952
+operações a mais. Um bit a mais na entrada dobra a quantidade de
+operações. É um crescimento relevante do volume de trabalho.\xe
+
+\ex{} Considere o problema de testar se um número $n$ é primo. Uma
+forma é verificar se algum número da lista $2, 3,$ ..., $\sqrt{n}$
+divide $n.$ Se não dividir, $n$ é primo. Digamos inicialmente que o
+custo desse procedimento é $\sqrt{n} - 1$ divisões, que é um custo
+sublinear. Mas refaçamos a análise com base na quantidade de bits como
+entrada. A entrada é um número $n,$ que ocupa uma quantidade da ordem
+de $\lg n$ bits. O custo do procedimento é da ordem de $\sqrt{n}.$
+Veja que o custo não está expresso em $\lg n$ bits, mas sim relativo à
+$n.$ Quanto é $n$ em termos de $\lg n$ bits? Seja $x = \lg n.$ Assim
+$n = 2^x.$ Logo, o custo é da ordem de $\sqrt{2^x} = 2^{x/2}$ relativo
+à quantidade de bits da entrada.  (A propósito, levando em
+consideração que cada divisão é da ordem de $\lg^2 x$, o custo é da
+ordem $2^{x/2} \lg^2 x$, que é da mesma ordem que $2^{x/2}$.)\xe
+
+\rem{} É por isso que se usa a expressão ``exponencial em $\lg n$.''
+O que se quer dizer é que o custo é expresso com respeito a uma certa
+quantia.  É por isso que na \refdef{polytime}, a variável independente
+é o logaritmo na base 2 dos números arbitrários fornecidos pela
+entrada.  Qualquer análise matemática é relativa a um conjunto de
+primitivas. \mer
+
+\ex{} No cálculo do custo do crivo de Eratóstenes\cite[página 17,
+  18]{scc}, chega-se ao fato de que o custo é inferior a $O(n^2)$.  O
+custo todavia não é quadrático.  O custo é exponencial porque relativo
+à $\lg n$, $n^2 = 2^{2x}.$\xe
+
+\printbibliography 
+ 
+\end{document}
+
+

@@ -1,0 +1,2 @@
+#!/bin/sh
+mascii-first-stage "$@" | mascii-second-stage | mascii-third-stage
