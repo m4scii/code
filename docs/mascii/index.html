@@ -1,0 +1,84 @@
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>mascii: mathematical ascii</title>
+</head>
+
+<body bgcolor="#ffffff">
+
+<h2>The <tt>mascii</tt> translator</h2>
+
+<table> <tr> <td valign="top" width="100%">
+
+This page documents my years of failure trying to write interpreters
+to ease my text writing such as LaTeX.  I'll begin with introducing
+you to <tt>mascii</tt>.  Then I'll show you <tt>elproc</tt> and
+finally I'll point to softwares that can do the job properly.  Come
+with me on this adventure.
+
+The word ``mascii'' stands for ``mathematical ascii.'' That's a few set
+of rules that I use when I write mathematics that I intend to convert to
+TeX or LaTeX.<br><br>
+
+The program <tt>mascii</tt> does the translation. For example, the
+program <tt>mascii</tt> can read ``let f(x) be a function from R -> R
+such that f(x + y) = f(x) <*> f(y)'' and translate that to ``let $f(x)$
+be a function from $\mathbb{R} \to \mathbb{R}$ such that $f(x + y) =
+f(x) \cdot f(y)$.''<br><br>
+
+This page does not describe the language that <tt>mascii</tt>
+understands; this page just announces the program. To learn about
+<tt>mascii</tt> translation capabilities, you must read the
+documentation of the software included in the package of the
+software.<br><br>
+
+Because <tt>mascii</tt> makes a lot of mistakes, it is interesting to
+use it slowly on small regions, as you write, so that you can learn
+about its mistakes --- and learn to cope with them.  For example,
+currently, if you write two fractions in the same
+line, <tt>mascii</tt> will do the wrong thing, so it's convenient to
+avoid writing two fractions on the same line.
+
+But, before you know what to do, you must know what is
+a <tt>mascii</tt> fraction.  A <tt>mascii</tt> fraction is any
+sequence of bytes that matches the regular expression <br><br>
+
+<center><tt>({[^}].*}[ ]*/[ ]*{[^}].*})</tt></center><br>
+
+ which 1/2 does not match.  Not matching 1/2 is interesting because
+quite often I want to write something like ``(x + 1)^{1/2}'' and I
+don't want <tt>mascii</tt> to tell TeX that the ``1/2'' is supposed to
+be a fraction in the shape ``numerator on top, a dash underneath, and
+denominator on the bottom.''  Examples of fractions that get this
+shape are <br><br>
+
+<center><tt>{ numerator } / { denominator }. </tt></center><br>
+
+Spaces in between things are allowed.
+
+<h2>Interaction with the GNU EMACS</h2>
+
+I like to use <tt>mascii</tt> from inside my GNU EMACS.  As I write a
+paragraph, or a few paragraphs, I select a region that encloses the
+text I wrote, then I press the key a combination of keys which causes
+the GNU EMACS to feed that text to <tt>mascii</tt> and the GNU EMACS
+replaces the region with the output of <tt>mascii</tt>. <br><br>
+
+Notice the pictures. On the first, I have written a piece of text; on
+the second, I've selected a region under the GNU EMACS. On the third,
+I pressed a special key combination and the GNU EMACS has replaced the
+region with the output from <tt>mascii</tt>.
+
+</td> <td> </td> <td>
+
+<img src="https://s26.postimg.org/y9aux6asp/em-plain.png">
+<img src="https://s26.postimg.org/ktnu7q2ax/em-region.png">
+<img src="https://s26.postimg.org/miwxfsi09/em-mascii.png"> 
+
+</td> </tr> </table>
+
+Created: Wed Sep 27 14:17:26 EDT 2006.<br>
+Updated: Wed Sep 27 14:17:30 EDT 2006.
+</body>
+</html>
