@@ -1,76 +1,172 @@
 <html>
 <head>
-<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>mascii: mathematical ascii</title>
+  <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>mascii</title>
 </head>
 
 <body bgcolor="#ffffff">
 
-<h2>The <tt>mascii</tt> translator</h2>
+<h2>O tradutor <tt>mascii</tt></h2>
 
-<table> <tr> <td valign="top" width="100%">
+<table> <tr> <td valign="top" width="100%"> 
+A palavra ``mascii'' significa ``mathematical ascii,'' um conjunto de
+regras que uso quando escrevo matemática que será formatada com TeX ou
+LaTeX.  É o programas <tt>mascii</tt> quem faz a tradução.<br><br>
 
-This page documents my years of failure trying to write interpreters
-to ease my text writing such as LaTeX.  I'll begin with introducing
-you to <tt>mascii</tt>.  Then I'll show you <tt>elproc</tt> and
-finally I'll point to softwares that can do the job properly.  Come
-with me on this adventure.
+Nunca soube escrever esses tipos de programas.  O <tt>mascii</tt> não
+deu muito certo, embora o utilize todos os dias ainda.  (Escrever
+LaTeX é tão doloroso que mesmo um programa cheio de incongruências
+consegue ajudar.)  Nunca consegui escrever esse tipo de programa. <br><br> 
 
-The word ``mascii'' stands for ``mathematical ascii.'' That's a few set
-of rules that I use when I write mathematics that I intend to convert to
-TeX or LaTeX.<br><br>
+Vejamos o que o mascii é capaz de fazer.  Por exemplo, ele pode ler
+``let f(x) be a function from R -> R such that f(x + y) = f(x) <*>
+f(y)'' e traduzir para ``let $f(x)$ be a function from $\mathbb{R} \to
+\mathbb{R}$ such that $f(x + y) = f(x) \cdot f(y)$.''<br><br>
 
-The program <tt>mascii</tt> does the translation. For example, the
-program <tt>mascii</tt> can read ``let f(x) be a function from R -> R
-such that f(x + y) = f(x) <*> f(y)'' and translate that to ``let $f(x)$
-be a function from $\mathbb{R} \to \mathbb{R}$ such that $f(x + y) =
-f(x) \cdot f(y)$.''<br><br>
+Não descrevei a linguagem que <tt>mascii</tt> compreende.  Temos aqui
+apenas um anúncio da existência do programa.  Para conhecer as
+capacidades do <tt>mascii</tt>, você precisa o código fonte
+dele.<br><br>
 
-This page does not describe the language that <tt>mascii</tt>
-understands; this page just announces the program. To learn about
-<tt>mascii</tt> translation capabilities, you must read the
-documentation of the software included in the package of the
-software.<br><br>
+Como <tt>mascii</tt> comete muitos erros, é interessante usá-lo em
+pequenas regiões do seu texto, à medida que você escreva, pra que você
+aprenda sobre seus erros --- e saiba lidar com eles.  Por exemplo, se
+você escrever duas frações na mesma linha, <tt>mascii</tt> fará a
+coisa errada, então é conveniente evitar escrever duas frações na
+mesma linha.<br><br>
 
-Because <tt>mascii</tt> makes a lot of mistakes, it is interesting to
-use it slowly on small regions, as you write, so that you can learn
-about its mistakes --- and learn to cope with them.  For example,
-currently, if you write two fractions in the same
-line, <tt>mascii</tt> will do the wrong thing, so it's convenient to
-avoid writing two fractions on the same line.
-
-But, before you know what to do, you must know what is
-a <tt>mascii</tt> fraction.  A <tt>mascii</tt> fraction is any
-sequence of bytes that matches the regular expression <br><br>
+Aproveito pra descrever o que é uma fração mascii.  Uma fração mascii
+é qualquer sequência de caracteres que satisfaça a seguinte expressão
+regular <br><br>
 
 <center><tt>({[^}].*}[ ]*/[ ]*{[^}].*})</tt></center><br>
 
- which 1/2 does not match.  Not matching 1/2 is interesting because
-quite often I want to write something like ``(x + 1)^{1/2}'' and I
-don't want <tt>mascii</tt> to tell TeX that the ``1/2'' is supposed to
-be a fraction in the shape ``numerator on top, a dash underneath, and
-denominator on the bottom.''  Examples of fractions that get this
-shape are <br><br>
+a qual, por exemplo, 1/2 não satisfaz.  (Espero que isso não lhe
+supreenda.)  Não enquadradar 1/2 na regra é interessante porque
+frequentemente desejo escrever trechos como ``(x + 1)^{1/2}'' e não
+quero que o <tt>mascii</tt> diga a TeX que ``1/2'' deve ser na forma
+``numerador sobre denominador.''  Exemplos de fração que obterão essa
+forma são os da forma <br><br>
 
-<center><tt>{ numerator } / { denominator }. </tt></center><br>
+<center><tt>{ numerador } / { denominador }. </tt></center><br>
 
-Spaces in between things are allowed.
+Espaços entre sintaxe é usualmente aceito, mas há exceções.  (Você
+precisa ver o código para ter os detalhes.)
 
-<h2>Interaction with the GNU EMACS</h2>
+<h2>Interação com o GNU EMACS</h2>
 
-I like to use <tt>mascii</tt> from inside my GNU EMACS.  As I write a
-paragraph, or a few paragraphs, I select a region that encloses the
-text I wrote, then I press the key a combination of keys which causes
-the GNU EMACS to feed that text to <tt>mascii</tt> and the GNU EMACS
-replaces the region with the output of <tt>mascii</tt>. <br><br>
+Se você não usa o GNU EMACS está perdendo ótima ferramenta.  (Se não
+programa Lisp, nem sabe o que é uma linguagem interessante.)  Sem o
+GNU EMACS, usar o <tt>mascii</tt> não é muito conveniente.  À medida
+que escrevo um parágrafo, ou alguns deles, seleciono a região e
+pressiono uma combinação de teclas que faz com que o GNU EMACS
+alimente o <tt>mascii</tt> com a região de texto.  Daí <tt>mascii</tt>
+processa o texto e produz o resultado, ao qual o GNU EMACS substitui
+pela região de texto selecionada.<br><br>
 
-Notice the pictures. On the first, I have written a piece of text; on
-the second, I've selected a region under the GNU EMACS. On the third,
-I pressed a special key combination and the GNU EMACS has replaced the
-region with the output from <tt>mascii</tt>.
+Note as figuras.  Na primeira, tenho um trecho de código a ser
+processado pelo mascii.  Na segunda, selecionei a região.  Na
+terceira, já havia dado o comando e o GNU EMACS substituiu a região
+com o texto produzido pelo <tt>mascii</tt>.  Esse exemplo é muito
+artificial, onde <tt>mascii</tt> faz perfeitamente o que se deseja.
+Não é sempre assim.
 
-</td> <td> </td> <td>
+<h2>Sobre o elproc</h2>
+
+Tendo fracassado com o <tt>mascii</tt>, resolvi me aventurar a
+escrever o <tt>elproc</tt>.  O nome elproc vem de ``el processador de
+documentos.''  Ele é um compilador de texto.  Você precisa usá-lo pra
+compreender bem o que ele faz, mas eis uma tentativa de descrição bem
+como um exemplo.<br><br>
+
+Como escrever código de computador, escrever texto também é uma tarefa
+muito repetitiva.  Seria bom termos ferramentas com a qual possamamos
+construir abstrações a serem concretizadas --- pela ferramenta.  Por
+exemplo, em determinado documento, você pode querer escrever que 1 é
+aproximadamente log 2.71.  Para mostrar que sua estimativa é adequada,
+você resolver exibir o valor exato da computação.  Mas qual é o valor
+exato de log 2.71?  Tem que recorrer a uma calculadora.  Mas os
+computadores são calculadoras.  O <tt>elproc</tt> portanto evita que
+você tenha que se dar a esse trabalho.  Usando o <tt>elproc</tt>, você
+só precisa escrever
+
+<pre>``1 =~ log 2.71 =  (log 2.71)...'' </pre>
+
+e ele produz ``1 =~ log 2.71 = 0.9969486348916096...''  Ele substitui
+a chamada de função em notação Lisp pelo resultado da
+computação.<br><br>
+
+Como outro exemplo, veja a seção abaixo com os vários links para
+download de versões históricas do <tt>elproc</tt>.  O código HTML para
+produzi-los são todos muito parecidos e portanto foram abstraídos em
+uma função.  O código elproc é 
+
+<pre>
+(define (pkg2 fn)
+  (format "~a" (ln fn (first (regexp-match "[0-9].[0-9][0-9]" fn)))))
+
+(define (pkg v)
+  (pkg2 (string-append "files/elproc-" (format "~a" v) ".cpio.gz")))
+
+(define (pkgs f . ls)
+  (format "~a"
+   (foldr string-append "" (add-between (map pkg (cons f ls)) ",\n"))))
+
+Os pacotes são [(pkgs 0.02 0.12 0.13 0.14 0.15)]; estão em ordem
+histórica.''
+</pre>
+
+O resultado é <xmp><p>Os pacotes são <a href="files/elproc-0.02.cpio.gz">0.02</a>,
+<a href="files/elproc-0.12.cpio.gz">0.12</a>,
+<a href="files/elproc-0.13.cpio.gz">0.13</a>,
+<a href="files/elproc-0.14.cpio.gz">0.14</a>,
+<a href="files/elproc-0.15.cpio.gz">0.15</a>,
+<a href="files/elproc-0.16.cpio.gz">0.16</a>; estão em ordem
+histórica.</p></xmp>
+
+Ou seja, o <tt>elproc</tt> permite que você processe seu texto com uma
+linguagem Lisp.  O <tt>elproc</tt> foi escrito em Racket.
+
+<h2>A ideia</h2>
+
+Pode parecer boa a ideia, mas o <tt>elproc</tt> não é um caso de
+sucesso porque não foi propriamente implementado e o código não foi
+bem escrito.  (Foi o primeiro programa em Lisp que escrevi.)<br><br>
+
+Tanto o <tt>mascii</tt> quanto o <tt>elproc</tt> foram tentativas de
+se fazer uma ferramenta que tornasse a produção de texto um trabalho
+de programação.  Isso é uma observação importante.  Programação de
+computadores não é uma atividade restrita da ciência da computação.
+Um texto é um programa.  Um livro é um programa.  Como os
+programadores, quem escreve também precisa de ferramentas de abstração
+e processamento.<br><br>
+
+Para uma implementação adequada da ideia, veja
+o <a href="https://docs.racket-lang.org/scribble/">Scribble</a>.
+
+<h2>Pacotes do elproc</h2>
+
+<p>Os pacotes são <a href="files/elproc-0.02.cpio.gz">0.02</a>,
+<a href="files/elproc-0.12.cpio.gz">0.12</a>,
+<a href="files/elproc-0.13.cpio.gz">0.13</a>,
+<a href="files/elproc-0.14.cpio.gz">0.14</a>,
+<a href="files/elproc-0.15.cpio.gz">0.15</a>,
+<a href="files/elproc-0.16.cpio.gz">0.16</a>; estão em ordem
+histórica.</p>
+
+<!-- <h2>Um exemplo </h2> -->
+
+
+<!-- <p>Para escrever ``1 =~ log 2.71 = 0.9969486348916096...'' bastaria escrever</p> -->
+
+
+<!-- <pre>``1 =~ log 2.71 =  (log 2.71)...'' </pre> -->
+
+
+<!-- <p>Entende? Veja este próprio <a href="elproc/elproc.notes.elproc">documento</a> para uma exemplo mais extenso. Veja aí.</p> -->
+
+</td> <td> </td> <td valign="top">
 
 <img src="https://s26.postimg.org/y9aux6asp/em-plain.png">
 <img src="https://s26.postimg.org/ktnu7q2ax/em-region.png">
@@ -78,7 +174,8 @@ region with the output from <tt>mascii</tt>.
 
 </td> </tr> </table>
 
+<br>
 Created: Wed Sep 27 14:17:26 EDT 2006.<br>
-Updated: Wed Sep 27 14:17:30 EDT 2006.
+Updated: Wed, 30 Dec 2009 17:28:35 +0100.
 </body>
 </html>
